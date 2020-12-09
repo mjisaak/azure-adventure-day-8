@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: arcadebackend
   labels:
-    name: arcadebackend    
+    name: arcadebackend  
 spec:
   selector:
-    name: arcadebackend    
+    name: arcadebackend  
   type: LoadBalancer
   ports:
    - port: 80
@@ -19,23 +19,25 @@ kind: Deployment
 metadata:
   name: arcadebackend
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       name: arcadebackend      
   minReadySeconds: 5
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
         name: arcadebackend        
     spec:
+      imagePullSecrets:
+        - name: acr-secret
       # imagePullSecrets:
       #   - name: teamregistry
       containers:
       - name: arcadebackend
-        image: ghcr.io/azure-adventure-day/azure-adventure-day-coach/gamebot:latest
+        image: t34m8acree9720.azurecr.io/gamebot/metal:latest
         imagePullPolicy: Always
         ports:
           - containerPort: 8080
@@ -46,3 +48,13 @@ spec:
             value: "8080"
           - name: "PICK_STRATEGY"
             value: "RANDOM"
+          - name: "FF_BETS"
+            value: "1"
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 80
+        #   initialDelaySeconds: 1
+        #   periodSeconds: 10
+        #   timeoutSeconds: 1
+        #   failureThreshold: 1
